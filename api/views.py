@@ -16,8 +16,7 @@ from api.utils import _get_user_coords_or_params, _parse_bool, _parse_float, ann
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
-
-from backend import settings
+from django.conf import settings
 from .serializers import LOCALE_PUBLIC_FIELDS, PERSONA_PUBLIC_FIELDS, EventoSerializer, FriendRequestActionSerializer, FriendRequestSerializer, LocalePrivacySerializer, LocaleSerializer, PersonaListSerializer, PersonaListWithFriendshipSerializer, PersonaPrivacySerializer, PersonaSerializer, RegistrazioneSerializer, LoginSerializer, User, UserLocationInSerializer
 from .serializers import PersonaDetailSerializer, LocaleDetailSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -164,7 +163,8 @@ class LoginView(APIView):
             value=str(refresh),
             httponly=True,
             secure=True,         # ✅ metti True in produzione su HTTPS
-            samesite="Lax",
+            samesite="None",   # 👈 aggiungi
+            secure=True,
             max_age=cookie_max_age,  # None => session cookie
             path="/",
         )
