@@ -10,6 +10,8 @@ from django.db.models.functions import ACos, Cos, Sin, Radians, Least, Greatest
 from django.db.models import Exists, OuterRef, Value, CharField, Q
 from .models import FriendRequest
 from django.db.models import Case, When, BooleanField
+import logging
+logger = logging.getLogger(__name__)
 
 def send_activation_email(user, request):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -52,14 +54,18 @@ def send_activation_email(user, request):
     </html>
     """
 
-    send_mail(
-        subject=subject,
-        message=text_message,  # fallback per client che non leggono HTML
-        from_email=from_email,
-        recipient_list=to_email,
-        html_message=html_message,
-        fail_silently=False,
-    )
+    try:
+        sent_count = send_mail(
+            subject=subject,
+            message=text_message,
+            from_email=from_email,
+            recipient_list=to_email,
+            html_message=html_message,
+            fail_silently=False,  # 🔥 lascialo a False per loggare l’errore
+        )
+        logger.info(f"✅ Activation email inviata a {user.email} ({sent_count} msg)")
+    except Exception as e:
+        logger.exception(f"❌ Errore nell’invio email di attivazione a {user.email}: {e}")
 
 def send_password_reset_email(user, request, uid, token):
     # ✅ URL del frontend, non dell’API
