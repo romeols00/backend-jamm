@@ -162,7 +162,6 @@ class LoginView(APIView):
             key="refresh_token",
             value=str(refresh),
             httponly=True,
-            secure=True,         # ✅ metti True in produzione su HTTPS
             samesite="None",   # 👈 aggiungi
             secure=True,
             max_age=cookie_max_age,  # None => session cookie
@@ -190,8 +189,14 @@ class LogoutView(APIView):
 
     def post(self, request):
         response = Response(status=status.HTTP_205_RESET_CONTENT)
-        response.delete_cookie("refresh_token")
+        response.delete_cookie(
+            "refresh_token",
+            path="/",
+            samesite="None",   # 👈 aggiungi
+            secure=True        # 👈 aggiungi (coerente con set)
+        )
         return response
+   
 
 
 class ListaEventiView(generics.ListAPIView):
