@@ -1,7 +1,7 @@
 from datetime import timedelta
 from rest_framework_simplejwt.exceptions import TokenError
-from django.forms import BooleanField, ValidationError
-from django.http import JsonResponse
+from django.forms import ValidationError
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -188,14 +188,11 @@ class LogoutView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        response = Response(status=status.HTTP_205_RESET_CONTENT)
-        response.delete_cookie(
-            "refresh_token",
-            path="/",
-            samesite="None",   # 👈 aggiungi
-            secure=True        # 👈 aggiungi (coerente con set)
-        )
-        return response
+      
+        resp = HttpResponse(status=status.HTTP_205_RESET_CONTENT)
+     
+        resp.delete_cookie("refresh_token", path="/")
+        return resp
    
 
 
